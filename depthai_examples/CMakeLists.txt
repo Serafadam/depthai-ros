@@ -37,86 +37,86 @@ file(DOWNLOAD "https://artifacts.luxonis.com/artifactory/luxonis-depthai-data-lo
 
 find_package(ament_cmake REQUIRED)
 
-  message(STATUS "------------------------------------------")
-  message(STATUS "Depthai Bridge is being built using AMENT.")
-  message(STATUS "------------------------------------------")
+message(STATUS "------------------------------------------")
+message(STATUS "Depthai Bridge is being built using AMENT.")
+message(STATUS "------------------------------------------")
 
-  find_package(camera_info_manager REQUIRED)
-  find_package(cv_bridge REQUIRED)
-  find_package(depthai CONFIG REQUIRED)
-  find_package(depthai_ros_msgs REQUIRED)
-  find_package(depthai_bridge REQUIRED)
-  find_package(rclcpp REQUIRED)
-  find_package(sensor_msgs REQUIRED)
-  find_package(stereo_msgs REQUIRED)
-  find_package(std_msgs REQUIRED)
-  find_package(vision_msgs REQUIRED)
+find_package(camera_info_manager REQUIRED)
+find_package(cv_bridge REQUIRED)
+find_package(depthai CONFIG REQUIRED)
+find_package(depthai_ros_msgs REQUIRED)
+find_package(depthai_bridge REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(stereo_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(vision_msgs REQUIRED)
 
-  set(dependencies
-    camera_info_manager
-    cv_bridge
-    depthai_ros_msgs
-    depthai_bridge
-    rclcpp
-    sensor_msgs
-    stereo_msgs
-    std_msgs
-    vision_msgs
-  )
+set(dependencies
+  camera_info_manager
+  cv_bridge
+  depthai_ros_msgs
+  depthai_bridge
+  rclcpp
+  sensor_msgs
+  stereo_msgs
+  std_msgs
+  vision_msgs
+)
 
-  include_directories(
-    include
-    ${ament_INCLUDE_DIRS}
-  )
-
-
-  macro(dai_add_node_ros2 node_name node_src)
-    add_executable("${node_name}" "${node_src}")
-
-    target_link_libraries("${node_name}"  
-                          depthai::core 
-                          opencv_imgproc
-                          opencv_highgui)
-
-    ament_target_dependencies("${node_name}"  
-                              ${dependencies})    
-
-  endmacro() 
+include_directories(
+  include
+  ${ament_INCLUDE_DIRS}
+)
 
 
-  dai_add_node_ros2(crop_control_service src/crop_control_service.cpp)
-  dai_add_node_ros2(mobilenet_node src/mobilenet_publisher.cpp)
-  dai_add_node_ros2(rgb_node src/rgb_publisher.cpp)
-  dai_add_node_ros2(rgb_stereo_node src/rgb_stereo_node.cpp)
-  # dai_add_node_ros2(rgb_subscriber_node src/rgb_video_subscriber.cpp)
-  dai_add_node_ros2(stereo_inertial_node src/stereo_inertial_publisher.cpp)
-  dai_add_node_ros2(stereo_node src/stereo_publisher.cpp)
-  dai_add_node_ros2(yolov4_spatial_node src/yolov4_spatial_publisher.cpp)
-    
-  target_compile_definitions(mobilenet_node PRIVATE BLOB_NAME="${mobilenet_blob_name}")
-  target_compile_definitions(yolov4_spatial_node PRIVATE BLOB_NAME="${tiny_yolo_v4_blob_name}")
-  target_compile_definitions(stereo_inertial_node PRIVATE BLOB_NAME="${tiny_yolo_v4_blob_name}")
+macro(dai_add_node_ros2 node_name node_src)
+  add_executable("${node_name}" "${node_src}")
+
+  target_link_libraries("${node_name}"  
+                        depthai::core 
+                        opencv_imgproc
+                        opencv_highgui)
+
+  ament_target_dependencies("${node_name}"  
+                            ${dependencies})    
+
+endmacro() 
+
+
+dai_add_node_ros2(crop_control_service src/crop_control_service.cpp)
+dai_add_node_ros2(mobilenet_node src/mobilenet_publisher.cpp)
+dai_add_node_ros2(rgb_node src/rgb_publisher.cpp)
+dai_add_node_ros2(rgb_stereo_node src/rgb_stereo_node.cpp)
+# dai_add_node_ros2(rgb_subscriber_node src/rgb_video_subscriber.cpp)
+dai_add_node_ros2(stereo_inertial_node src/stereo_inertial_publisher.cpp)
+dai_add_node_ros2(stereo_node src/stereo_publisher.cpp)
+dai_add_node_ros2(yolov4_spatial_node src/yolov4_spatial_publisher.cpp)
   
-  if($ENV{ROS_DISTRO} STREQUAL "galactic")
-    target_compile_definitions(rgb_stereo_node PRIVATE IS_GALACTIC)
-  endif()
+target_compile_definitions(mobilenet_node PRIVATE BLOB_NAME="${mobilenet_blob_name}")
+target_compile_definitions(yolov4_spatial_node PRIVATE BLOB_NAME="${tiny_yolo_v4_blob_name}")
+target_compile_definitions(stereo_inertial_node PRIVATE BLOB_NAME="${tiny_yolo_v4_blob_name}")
+
+if($ENV{ROS_DISTRO} STREQUAL "galactic")
+  target_compile_definitions(rgb_stereo_node PRIVATE IS_GALACTIC)
+endif()
 
 
-  install(DIRECTORY params DESTINATION share/${PROJECT_NAME})
-  install(DIRECTORY rviz DESTINATION share/${PROJECT_NAME})
-  install(DIRECTORY resources DESTINATION share/${PROJECT_NAME})
-  install(DIRECTORY launch/ DESTINATION share/${PROJECT_NAME}/launch
-  FILES_MATCHING PATTERN "*.py")
+install(DIRECTORY params DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY rviz DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY resources DESTINATION share/${PROJECT_NAME})
+install(DIRECTORY launch/ DESTINATION share/${PROJECT_NAME}/launch
+FILES_MATCHING PATTERN "*.py")
 
-  install(TARGETS
-          crop_control_service
-          mobilenet_node
-          rgb_node
-          rgb_stereo_node
-          stereo_inertial_node
-          stereo_node
-          yolov4_spatial_node
-          DESTINATION lib/${PROJECT_NAME})
-          
-  ament_package()
+install(TARGETS
+        crop_control_service
+        mobilenet_node
+        rgb_node
+        rgb_stereo_node
+        stereo_inertial_node
+        stereo_node
+        yolov4_spatial_node
+        DESTINATION lib/${PROJECT_NAME})
+        
+ament_package()
 
